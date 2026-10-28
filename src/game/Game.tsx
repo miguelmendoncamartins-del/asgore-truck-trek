@@ -3,6 +3,9 @@ import { useGLTF, Environment, Lightformer } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import truckAsset from "@/assets/truck.glb.asset.json";
+import songAsset from "@/assets/song.mp3.asset.json";
+
+const SONG_START = 18;
 import { laneX, LYRICS, ENDING, newGame, step, steer, type GameState, type Entity } from "./rules";
 
 type Hud = { score: number; beers: number; deers: number; speed: number; over: boolean; flash: string };
@@ -169,6 +172,18 @@ export default function Game() {
   const [started, setStarted] = useState(false);
   const [flash, setFlash] = useState("");
   const [ready, setReady] = useState(false);
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const [songT, setSongT] = useState(0);
+
+  useEffect(() => {
+    const a = new Audio(songAsset.url);
+    a.preload = "auto";
+    a.addEventListener("ended", () => { a.currentTime = SONG_START; void a.play().catch(() => {}); });
+    audio.current = a;
+    const iv = setInterval(() => setSongT(a.currentTime), 250);
+    return () => { clearInterval(iv); a.pause(); };
+  }, []);
+  useEffect(() => { if (hud.over) audio.current?.pause(); }, [hud.over]);
 
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
@@ -179,14 +194,20 @@ export default function Game() {
     window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k);
   });
 
-  function restart() { s.current = newGame(); setStarted(true); setFlash(""); }
+  function restart() {
+    s.current = newGame(); setStarted(true); setFlash("");
+    const a = audio.current;
+    if (a) { a.currentTime = SONG_START; void a.play().catch(() => {}); }
+  }
   function onEvent(k: string) {
     const m: Record<string, string> = { beer: "+1 SKOL 🍺", deer: "ATROPELOU A DESS! 🦌💥", tree: "BATI NA ÁRVORE", police: "PEGO PELA POLÍCIA 🚓" };
     setFlash(m[k] ?? ""); setTimeout(() => setFlash(""), 900);
   }
   useEffect(() => { if (!started) s.current.over = true; }, [started]);
 
-  const lyric = LYRICS[Math.floor(hud.score / 400) % LYRICS.length];
+  const dur = audio.current?.duration && isFinite(audio.current.duration) ? audio.current.duration : 167;
+  const per = (dur - SONG_START) / LYRICS.length;
+  const lyric = LYRICS[Math.max(0, Math.floor((songT - SONG_START) / per)) % LYRICS.length];
 
   return (
     <div className="game-root" data-scene-ready={ready ? "" : undefined}>
