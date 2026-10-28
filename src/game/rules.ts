@@ -1,5 +1,6 @@
 // Pure game rules — no React / three imports.
-export const LANES = [-3.2, 0, 3.2];
+export const LANES: readonly number[] = [-3.2, 0, 3.2];
+export const laneX = (i: number) => laneX(i) ?? 0;
 export const BASE_SPEED = 22;
 export const MAX_SPEED = 48;
 export const ACCEL = 1.2;
@@ -71,13 +72,13 @@ export function step(s: GameState, dt: number): Kind[] {
   s.z -= s.speed * dt;
   s.score += s.speed * dt;
   s.wobble += dt * (1 + s.drunk);
-  const target = LANES[s.lane] + Math.sin(s.wobble * 2.2) * s.drunk * 0.6;
+  const target = laneX(s.lane) + Math.sin(s.wobble * 2.2) * s.drunk * 0.6;
   s.x += (target - s.x) * Math.min(1, LANE_SWITCH * dt);
   while (s.nextSpawn > s.z - 160) spawn(s);
   for (const e of s.entities) {
     if (e.kind === "police") e.z += 14 * dt; // oncoming, contra-mão
     if (e.hit) continue;
-    if (Math.abs(e.z - s.z) < 2.4 && Math.abs(LANES[e.lane] - s.x) < 1.8) {
+    if (Math.abs(e.z - s.z) < 2.4 && Math.abs(laneX(e.lane) - s.x) < 1.8) {
       e.hit = true;
       events.push(e.kind);
       if (e.kind === "beer") { s.beers++; s.score += 50; s.drunk = Math.min(1.5, s.beers / 7); }

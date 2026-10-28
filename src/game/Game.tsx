@@ -3,7 +3,7 @@ import { useGLTF, Environment, Lightformer } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import truckAsset from "@/assets/truck.glb.asset.json";
-import { LANES, LYRICS, ENDING, newGame, step, steer, type GameState, type Entity } from "./rules";
+import { laneX, LYRICS, ENDING, newGame, step, steer, type GameState, type Entity } from "./rules";
 
 type Hud = { score: number; beers: number; deers: number; speed: number; over: boolean; flash: string };
 
@@ -118,7 +118,7 @@ function World({ s, onHud, onEvent }: { s: React.MutableRefObject<GameState>; on
     step(st, dt).forEach(onEvent);
     if (truck.current) {
       truck.current.position.set(st.x, 0, st.z);
-      truck.current.rotation.y = (LANES[st.lane] - st.x) * -0.08 + Math.sin(st.wobble * 3) * st.drunk * 0.05;
+      truck.current.rotation.y = (laneX(st.lane) - st.x) * -0.08 + Math.sin(st.wobble * 3) * st.drunk * 0.05;
       truck.current.rotation.z = st.over ? 0.4 : 0;
     }
     if (road.current) road.current.position.set(0, 0.03, st.z - 100);
@@ -145,7 +145,7 @@ function World({ s, onHud, onEvent }: { s: React.MutableRefObject<GameState>; on
     <group ref={truck}><Suspense fallback={null}><Truck /></Suspense><Asgore /></group>
     {ents.map((e) => {
       if (e.hit && e.kind !== "tree" && e.kind !== "police") return null;
-      const x = LANES[e.lane];
+      const x = laneX(e.lane);
       return (<group key={e.id} position={[x, e.hit ? 0 : 0, e.z]} rotation={[0, 0, e.hit ? 1.2 : 0]}>
         {e.kind === "tree" && <Tree />}{e.kind === "police" && <Police t={t} />}
         {e.kind === "beer" && <Beer />}{e.kind === "deer" && <Deer />}
@@ -182,7 +182,7 @@ export default function Game() {
   function restart() { s.current = newGame(); setStarted(true); setFlash(""); }
   function onEvent(k: string) {
     const m: Record<string, string> = { beer: "+1 SKOL 🍺", deer: "ATROPELOU A DESS! 🦌💥", tree: "BATI NA ÁRVORE", police: "PEGO PELA POLÍCIA 🚓" };
-    setFlash(m[k]); setTimeout(() => setFlash(""), 900);
+    setFlash(m[k] ?? ""); setTimeout(() => setFlash(""), 900);
   }
   useEffect(() => { if (!started) s.current.over = true; }, [started]);
 
