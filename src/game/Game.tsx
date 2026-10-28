@@ -14,7 +14,7 @@ function Truck() {
     const box = new THREE.Box3().setFromObject(c);
     const size = box.getSize(new THREE.Vector3());
     const g = new THREE.Group();
-    if (size.x > size.z) c.rotation.y = Math.PI / 2;
+    c.rotation.y = size.x > size.z ? -Math.PI / 2 : Math.PI;
     g.add(c);
     const b2 = new THREE.Box3().setFromObject(g);
     const s2 = b2.getSize(new THREE.Vector3());
@@ -121,7 +121,7 @@ function World({ s, onHud, onEvent }: { s: React.MutableRefObject<GameState>; on
       truck.current.rotation.y = (LANES[st.lane] - st.x) * -0.08 + Math.sin(st.wobble * 3) * st.drunk * 0.05;
       truck.current.rotation.z = st.over ? 0.4 : 0;
     }
-    if (road.current) road.current.position.z = st.z - 100;
+    if (road.current) road.current.position.set(0, 0.03, st.z - 100);
     tex.offset.y = 0;
     const sway = Math.sin(st.wobble * 1.3) * st.drunk * 0.8;
     camera.position.lerp(new THREE.Vector3(st.x * 0.6 + sway, 7, st.z + 13), 0.15);
