@@ -136,8 +136,8 @@ function World({ s, onHud, onEvent }: { s: React.MutableRefObject<GameState>; on
   });
 
   return (<>
-    <mesh ref={road} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[10, 400]} /><meshStandardMaterial map={tex} />
+    <mesh ref={road} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, -100]} receiveShadow renderOrder={1}>
+      <planeGeometry args={[10, 400]} /><meshStandardMaterial map={tex} color="#ffffff" polygonOffset polygonOffsetFactor={-4} />
     </mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, s.current.z]} receiveShadow>
       <planeGeometry args={[300, 4000]} /><meshStandardMaterial map={grass} />
