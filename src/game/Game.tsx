@@ -79,7 +79,7 @@ function Deer() {
     <mesh position={[0, 1.9, 0.8]}><boxGeometry args={[0.5, 0.6, 0.6]} /><meshStandardMaterial color={c} /></mesh>
     <mesh position={[0, 2.35, 0.8]}><coneGeometry args={[0.2, 0.3, 4]} /><meshStandardMaterial color="#ff4aa0" /></mesh>
     {[[-0.25, -0.6], [0.25, -0.6], [-0.25, 0.6], [0.25, 0.6]].map(([x, z], i) => (
-      <mesh key={i} position={[x, 0.45, z]}><boxGeometry args={[0.15, 0.9, 0.15]} /><meshStandardMaterial color="#7a4b22" /></mesh>
+      <mesh key={i} position={[x ?? 0, 0.45, z ?? 0]}><boxGeometry args={[0.15, 0.9, 0.15]} /><meshStandardMaterial color="#7a4b22" /></mesh>
     ))}
     {[-1, 1].map((s) => <mesh key={s} position={[s * 0.25, 2.5, 0.7]} rotation={[0, 0, -s * 0.5]}><cylinderGeometry args={[0.04, 0.04, 0.6]} /><meshStandardMaterial color="#5a3a1a" /></mesh>)}
   </group>);
