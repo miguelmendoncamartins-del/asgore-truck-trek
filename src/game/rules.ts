@@ -1,6 +1,6 @@
 // Pure game rules — no React / three imports.
 export const LANES: readonly number[] = [-3.2, 0, 3.2];
-export const laneX = (i: number) => laneX(i) ?? 0;
+export const laneX = (i: number): number => LANES[i] ?? 0;
 export const BASE_SPEED = 22;
 export const MAX_SPEED = 48;
 export const ACCEL = 1.2;
